@@ -50,7 +50,18 @@ func NewMeshFromFile(path string) Mesh {
 		log.Printf("obj: parse error input=%s: %v", path, errObj)
 	}
 
-	return NewMesh(o.Coord)
+	var vertices []Vertex
+	var indices []uint32
+
+	for i := 0; i < len(o.Coord); i += 3 {
+		vertices = append(vertices, NewVertex(mgl32.Vec3{o.Coord[i], o.Coord[i+1], o.Coord[i+2]}))
+	}
+
+	for i := 0; i < len(o.Indices); i++ {
+		indices = append(indices, uint32(o.Indices[i]))
+	}
+
+	return NewMesh(vertices, indices)
 }
 
 func NewTriangle() Mesh {
