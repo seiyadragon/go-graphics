@@ -22,12 +22,17 @@ func Init() (*glfw.Window, error) {
 		return nil, err
 	}
 
+	gl.Enable(gl.CULL_FACE)
+
+	gl.Enable(gl.BLEND)
+	gl.BlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
 	return window, err
 }
 
 func ClearScreen(color Color) {
-	flt := color.ToFloat()
-	gl.ClearColor(flt.R, flt.G, flt.B, flt.A)
+	flt := color.ToVec4()
+	gl.ClearColor(flt.X(), flt.Y(), flt.Z(), flt.W())
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 }
 

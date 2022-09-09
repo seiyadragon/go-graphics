@@ -1,9 +1,7 @@
 package graphics
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/mathgl/mgl32"
@@ -26,6 +24,7 @@ func NewMesh(vertices []Vertex, indices []uint32) Mesh {
 
 	vao.SetVertexAttrib(0, 0)
 	vao.SetVertexAttrib(1, 12)
+	vao.SetVertexAttrib(2, 24)
 	vao.Unbind()
 
 	return Mesh{vao, int32(len(indices))}
@@ -42,7 +41,7 @@ func (m Mesh) Draw(material Material) {
 func NewMeshFromFile(path string) Mesh {
 	options := &gwob.ObjParserOptions{
 		LogStats: true,
-		Logger:   func(msg string) { fmt.Fprintln(os.Stderr, msg) },
+		Logger:   func(msg string) { println(msg) },
 	}
 
 	o, errObj := gwob.NewObjFromFile(path, options)
@@ -53,8 +52,34 @@ func NewMeshFromFile(path string) Mesh {
 	var vertices []Vertex
 	var indices []uint32
 
-	for i := 0; i < len(o.Coord); i += 3 {
-		vertices = append(vertices, NewVertex(mgl32.Vec3{o.Coord[i], o.Coord[i+1], o.Coord[i+2]}))
+	if !o.TextCoordFound && !o.NormCoordFound {
+		for i := 0; i < len(o.Coord); i += 3 {
+			vertices = append(vertices, NewVertex(
+				mgl32.Vec3{o.Coord[i], o.Coord[i+1], o.Coord[i+2]},
+				mgl32.Vec3{0, 0, 0},
+				mgl32.Vec3{0, 0, 0}))
+		}
+	} else if o.TextCoordFound && !o.NormCoordFound {
+		for i := 0; i < len(o.Coord); i += 5 {
+			vertices = append(vertices, NewVertex(
+				mgl32.Vec3{o.Coord[i], o.Coord[i+1], o.Coord[i+2]},
+				mgl32.Vec3{o.Coord[i+3], o.Coord[i+4], 0},
+				mgl32.Vec3{0, 0, 0}))
+		}
+	} else if !o.TextCoordFound && o.NormCoordFound {
+		for i := 0; i < len(o.Coord); i += 6 {
+			vertices = append(vertices, NewVertex(
+				mgl32.Vec3{o.Coord[i], o.Coord[i+1], o.Coord[i+2]},
+				mgl32.Vec3{0, 0, 0},
+				mgl32.Vec3{o.Coord[i+5], o.Coord[i+6], o.Coord[i+7]}))
+		}
+	} else if o.TextCoordFound && o.NormCoordFound {
+		for i := 0; i < len(o.Coord); i += 8 {
+			vertices = append(vertices, NewVertex(
+				mgl32.Vec3{o.Coord[i], o.Coord[i+1], o.Coord[i+2]},
+				mgl32.Vec3{o.Coord[i+3], o.Coord[i+4], 0},
+				mgl32.Vec3{o.Coord[i+5], o.Coord[i+6], o.Coord[i+7]}))
+		}
 	}
 
 	for i := 0; i < len(o.Indices); i++ {
@@ -66,9 +91,9 @@ func NewMeshFromFile(path string) Mesh {
 
 func NewTriangle() Mesh {
 	vertices := []Vertex{
-		NewVertex(mgl32.Vec3{0, 1, 0}, mgl32.Vec3{0.5, 0, 0}),
-		NewVertex(mgl32.Vec3{-1, -1, 0}, mgl32.Vec3{0, 1, 0}),
-		NewVertex(mgl32.Vec3{1, -1, 0}, mgl32.Vec3{1, 1, 0}),
+		NewVertex(mgl32.Vec3{0, 1, 0}, mgl32.Vec3{0.5, 0, 0}, mgl32.Vec3{0, 0, 0}),
+		NewVertex(mgl32.Vec3{-1, -1, 0}, mgl32.Vec3{0, 1, 0}, mgl32.Vec3{0, 0, 0}),
+		NewVertex(mgl32.Vec3{1, -1, 0}, mgl32.Vec3{1, 1, 0}, mgl32.Vec3{0, 0, 0}),
 	}
 
 	indices := []uint32{0, 1, 2}
@@ -78,10 +103,10 @@ func NewTriangle() Mesh {
 
 func NewPlane() Mesh {
 	vertices := []Vertex{
-		NewVertex(mgl32.Vec3{-1, 1, 0}, mgl32.Vec3{0, 0, 0}),
-		NewVertex(mgl32.Vec3{-1, -1, 0}, mgl32.Vec3{0, 1, 0}),
-		NewVertex(mgl32.Vec3{1, -1, 0}, mgl32.Vec3{1, 1, 0}),
-		NewVertex(mgl32.Vec3{1, 1, 0}, mgl32.Vec3{1, 0, 0}),
+		NewVertex(mgl32.Vec3{-1, 1, 0}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 0, 0}),
+		NewVertex(mgl32.Vec3{-1, -1, 0}, mgl32.Vec3{0, 1, 0}, mgl32.Vec3{0, 0, 0}),
+		NewVertex(mgl32.Vec3{1, -1, 0}, mgl32.Vec3{1, 1, 0}, mgl32.Vec3{0, 0, 0}),
+		NewVertex(mgl32.Vec3{1, 1, 0}, mgl32.Vec3{1, 0, 0}, mgl32.Vec3{0, 0, 0}),
 	}
 
 	indices := []uint32{0, 1, 2, 2, 3, 0}
