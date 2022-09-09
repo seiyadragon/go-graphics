@@ -28,7 +28,7 @@ func NewTexture(data image.Image) Texture {
 	}
 
 	gl.GenTextures(1, &tex)
-	gl.BindTextureUnit(0, tex)
+	gl.BindTexture(gl.TEXTURE_2D, tex)
 
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_BORDER)
 	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_BORDER)
@@ -38,7 +38,7 @@ func NewTexture(data image.Image) Texture {
 	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(pixels))
 	gl.GenerateMipmap(gl.TEXTURE_2D)
 
-	gl.BindTexture(0, 0)
+	gl.BindTexture(gl.TEXTURE_2D, 0)
 
 	return Texture{tex}
 }
@@ -53,11 +53,13 @@ func NewTextureFromFile(path string) Texture {
 }
 
 func (t Texture) Bind(unit uint32) {
-	gl.BindTextureUnit(unit, t.Id)
+	gl.ActiveTexture(gl.TEXTURE0 + unit)
+	gl.BindTexture(gl.TEXTURE_2D, t.Id)
 }
 
 func (t Texture) Unbind(unit uint32) {
-	gl.BindTextureUnit(unit, 0)
+	gl.ActiveTexture(gl.TEXTURE0 + unit)
+	gl.BindTexture(gl.TEXTURE_2D, 0)
 }
 
 func getImageFromFilePath(filePath string) (image.Image, error) {

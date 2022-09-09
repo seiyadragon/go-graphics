@@ -14,17 +14,6 @@ type Shader struct {
 }
 
 func NewShader(vertexSrc string, fragmentSrc string) Shader {
-	vertexSrc = string("out vec3 tex_coords;\n") + vertexSrc
-	vertexSrc = string("uniform mat4 mvp;\n") + vertexSrc
-	vertexSrc = string("layout (location = 2) in vec3 in_normal;\n") + vertexSrc
-	vertexSrc = string("layout (location = 1) in vec3 in_tex_coords;\n") + vertexSrc
-	vertexSrc = string("layout (location = 0) in vec3 in_position;\n") + vertexSrc
-	vertexSrc = string("#version 410 core\n") + vertexSrc
-
-	fragmentSrc = string("out vec4 output_color;\n") + fragmentSrc
-	fragmentSrc = string("in vec3 tex_coords;\n") + fragmentSrc
-	fragmentSrc = string("#version 410 core\n") + fragmentSrc
-
 	program := gl.CreateProgram()
 	vertex, err := compileShader(vertexSrc, gl.VERTEX_SHADER)
 	if err != nil {

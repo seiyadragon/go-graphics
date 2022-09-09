@@ -9,10 +9,6 @@ func NewMaterial(shader Shader) Material {
 	return Material{shader, nil}
 }
 
-func (m Material) AddTexture(texture Texture) {
-	m.Textures = append(m.Textures, texture)
-}
-
 func (m Material) Bind() {
 	m.Shader.Bind()
 
