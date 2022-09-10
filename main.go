@@ -21,7 +21,7 @@ func main() {
 	layer := graphics.DefaultLayer(graphics.NewView(1280, 720, mgl32.Vec3{0, 0, 6}, mgl32.Vec3{0, 0, -1}, mgl32.Vec3{0, 1, 0}))
 
 	var models []graphics.Model
-	ball_amount := 2500
+	ball_amount := 25
 	ball_model := graphics.NewMeshFromFile("res/cube.obj")
 	shader := graphics.NewShaderFromFile("res/shader.glsl")
 	tex1 := graphics.NewTextureFromFile("res/test.jpg")
