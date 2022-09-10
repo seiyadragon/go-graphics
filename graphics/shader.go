@@ -37,18 +37,15 @@ func NewShader(vertexSrc string, fragmentSrc string) Shader {
 	return Shader{program}
 }
 
-func NewShaderFromFile(vertex string, fragment string) Shader {
-	vertexSrc, err := os.ReadFile(vertex)
+func NewShaderFromFile(path string) Shader {
+	src, err := os.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
 
-	fragmentSrc, err := os.ReadFile(fragment)
-	if err != nil {
-		panic(err)
-	}
+	srcs := strings.Split(string(src), "{separator}")
 
-	return NewShader(string(vertexSrc), string(fragmentSrc))
+	return NewShader(srcs[0], srcs[1])
 }
 
 func (s Shader) Bind() {

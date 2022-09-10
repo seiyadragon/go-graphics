@@ -1,6 +1,8 @@
 package graphics
 
-import "github.com/go-gl/mathgl/mgl32"
+import (
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type Model struct {
 	Mesh     Mesh

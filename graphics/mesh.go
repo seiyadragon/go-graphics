@@ -41,7 +41,7 @@ func (m Mesh) Draw(material Material) {
 func NewMeshFromFile(path string) Mesh {
 	options := &gwob.ObjParserOptions{
 		LogStats: true,
-		Logger:   func(msg string) { println(msg) },
+		Logger:   func(msg string) {},
 	}
 
 	o, errObj := gwob.NewObjFromFile(path, options)

@@ -41,7 +41,7 @@ func (m Layer) GetLayer() mgl32.Mat4 {
 	return transform.Mul4(scale.Mul4(rotate.Mat4()))
 }
 
-func (m Layer) Draw(model Model) {
+func (m Layer) DrawModel(model Model) {
 	model.Material.Shader.SetUniformMat4("mvp", m.View.GetView().Mul4(m.GetLayer()).Mul4(model.GetModel()))
 
 	model.Draw()
