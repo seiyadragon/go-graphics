@@ -25,7 +25,15 @@ func main() {
 	ball_model := graphics.NewMeshFromFile("res/cube.obj")
 	shader := graphics.NewShaderFromFile("res/shader.glsl")
 	tex1 := graphics.NewTextureFromFile("res/test.jpg")
-	tex2 := graphics.NewTextureFromFile("res/test2.jpg")
+	strip := graphics.NewTextureFromFile("res/strip2.png")
+
+	var frames []graphics.Texture
+
+	for i := 0; i < int(22); i++ {
+		subimage := strip.GetSubTexture(int32(i*144), 0, 144, 64)
+
+		frames = append(frames, subimage)
+	}
 
 	for i := 0; i < ball_amount; i++ {
 		models = append(models, graphics.NewModel(
@@ -33,15 +41,19 @@ func main() {
 			graphics.NewMaterial(shader),
 			mgl32.Vec3{0, 0, 10},
 			mgl32.Vec3{2, 3, 1},
-			mgl32.Vec3{2, 2, 1},
+			mgl32.Vec3{0.5, 0.5, 0.5},
 		))
 
 		models[i].Material.Shader.SetUniform4f("color", graphics.NewColor(169, 42, 69, 255).ToVec4())
-		models[i].Material.Shader.SetUniform1i("sampler_obj", 1)
-		models[i].Material.Shader.SetUniform1i("sampler_obj2", 0)
+		models[i].Material.Shader.SetUniform1i("sampler_obj", 0)
 		models[i].Material.Textures = append(models[i].Material.Textures, tex1)
-		models[i].Material.Textures = append(models[i].Material.Textures, tex2)
 	}
+
+	sprite := graphics.NewSprite(graphics.NewMaterial(shader), mgl32.Vec3{0, 0, -10}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{5, 5, 1})
+	sprite.Material.Shader.SetUniform4f("color", graphics.NewColor(255, 255, 255, 255).ToVec4())
+	sprite.Material.Shader.SetUniform1i("sampler_obj", 0)
+
+	animation := graphics.NewAnimation2D(60, frames)
 
 	counter := 0.0
 	lastTime := time.Now()
@@ -65,8 +77,12 @@ func main() {
 				float32(math.Sin(float64(i))*8) + float32(math.Cos(counter*1000)*3),
 				-20 - float32(math.Cos(float64(i))*8) + float32(math.Tan(counter*1000)*6)}
 
-			layer.DrawModel(models[i])
+			layer.Draw(models[i])
 		}
+
+		sprite.Material.Textures = append(sprite.Material.Textures, animation.GetAnimationFrame())
+		layer.Draw(sprite)
+		sprite.Material.Textures = append(sprite.Material.Textures[:0], sprite.Material.Textures[0+1:]...)
 
 		counter += 0.00001
 

@@ -4,6 +4,11 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+type Drawable interface {
+	GetModel() mgl32.Mat4
+	Draw(Layer)
+}
+
 type Model struct {
 	Mesh     Mesh
 	Material Material
@@ -24,6 +29,11 @@ func (m Model) GetModel() mgl32.Mat4 {
 	return transform.Mul4(scale.Mul4(rotate.Mat4()))
 }
 
-func (m Model) Draw() {
+func (m Model) Draw(layer Layer) {
+	m.Material.Shader.SetUniformMat4("mvp", layer.View.GetView().Mul4(layer.GetLayer()).Mul4(m.GetModel()))
 	m.Mesh.Draw(m.Material)
+}
+
+func NewSprite(material Material, position mgl32.Vec3, rotation mgl32.Vec3, scale mgl32.Vec3) Model {
+	return NewModel(NewPlane(), material, position, rotation, scale)
 }

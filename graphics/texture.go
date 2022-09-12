@@ -44,7 +44,7 @@ func NewTexture(data image.Image) Texture {
 }
 
 func NewTextureFromFile(path string) Texture {
-	image, err := getImageFromFilePath(path)
+	image, err := LoadImageFromFile(path)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,32 @@ func (t Texture) Unbind(unit uint32) {
 	gl.BindTexture(gl.TEXTURE_2D, 0)
 }
 
-func getImageFromFilePath(filePath string) (image.Image, error) {
+func (t Texture) GetSubTexture(x, y, width, height int32) Texture {
+	subimage := make([]uint8, width*height*4)
+
+	t.Bind(0)
+	gl.GetTextureSubImage(t.Id, 0, x, y, 0, width, height, 1, gl.RGBA, gl.UNSIGNED_BYTE, int32(len(subimage)*2), gl.Ptr(subimage))
+	t.Unbind(0)
+
+	var tex uint32
+
+	gl.GenTextures(1, &tex)
+	gl.BindTexture(gl.TEXTURE_2D, tex)
+
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_BORDER)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_BORDER)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+
+	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(subimage))
+	gl.GenerateMipmap(gl.TEXTURE_2D)
+
+	gl.BindTexture(gl.TEXTURE_2D, 0)
+
+	return Texture{tex}
+}
+
+func LoadImageFromFile(filePath string) (image.Image, error) {
 	f, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
