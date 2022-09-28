@@ -6,9 +6,11 @@ import (
 )
 
 type Vertex struct {
-	Position mgl32.Vec3
-	Texture  mgl32.Vec3
-	Normals  mgl32.Vec3
+	Position    mgl32.Vec3
+	Texture     mgl32.Vec3
+	Normals     mgl32.Vec3
+	BoneIds     mgl32.Vec3
+	BoneWeights mgl32.Vec3
 }
 
 type VAO struct {
@@ -24,7 +26,7 @@ type IBO struct {
 }
 
 func NewVertex(position mgl32.Vec3, texture mgl32.Vec3, normals mgl32.Vec3) Vertex {
-	return Vertex{position, texture, normals}
+	return Vertex{position, texture, normals, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 0, 0}}
 }
 
 func NewVAO() VAO {
@@ -44,7 +46,7 @@ func (v VAO) Unbind() {
 
 func (v VAO) SetVertexAttrib(attrib uint32, offset int) {
 	v.Bind()
-	gl.VertexAttribPointerWithOffset(attrib, 3, gl.FLOAT, false, 9*4, uintptr(offset))
+	gl.VertexAttribPointerWithOffset(attrib, 3, gl.FLOAT, false, 15*4, uintptr(offset))
 	gl.EnableVertexAttribArray(attrib)
 	v.Unbind()
 }
@@ -54,7 +56,7 @@ func NewVBO(data []Vertex) VBO {
 	gl.GenBuffers(1, &tmp)
 	vbo := VBO{tmp}
 	vbo.Bind()
-	gl.BufferData(gl.ARRAY_BUFFER, len(data)*(9*4), gl.Ptr(data), gl.STATIC_DRAW)
+	gl.BufferData(gl.ARRAY_BUFFER, len(data)*(15*4), gl.Ptr(data), gl.STATIC_DRAW)
 	vbo.Unbind()
 
 	return vbo

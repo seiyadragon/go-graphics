@@ -1,6 +1,10 @@
 package graphics
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-gl/mathgl/mgl32"
+)
 
 type Animation2D struct {
 	FPS            int
@@ -26,4 +30,26 @@ func (a *Animation2D) GetAnimationFrame() Texture {
 	}
 
 	return a.Frames[a.LastFrameIndex]
+}
+
+type Joint struct {
+	Id               float32
+	Children         []Joint
+	Transform        mgl32.Mat4
+	InverseTransform mgl32.Mat4
+}
+
+func NewJoint(id float32) Joint {
+	joint := Joint{id, nil, mgl32.Ident4(), mgl32.Ident4()}
+
+	return joint
+}
+
+func (j Joint) CalculateInveseTransform(parentTransform mgl32.Mat4) {
+	trans := parentTransform.Mul4(j.Transform)
+	j.InverseTransform = trans.Inv()
+
+	for i := 0; i < len(j.Children); i++ {
+		j.Children[i].CalculateInveseTransform(trans)
+	}
 }

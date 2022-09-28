@@ -25,6 +25,9 @@ func NewMesh(vertices []Vertex, indices []uint32) Mesh {
 	vao.SetVertexAttrib(0, 0)
 	vao.SetVertexAttrib(1, 12)
 	vao.SetVertexAttrib(2, 24)
+	vao.SetVertexAttrib(3, 36)
+	vao.SetVertexAttrib(4, 48)
+
 	vao.Unbind()
 
 	return Mesh{vao, int32(len(indices))}
